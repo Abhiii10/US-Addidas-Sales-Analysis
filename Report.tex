@@ -1,0 +1,609 @@
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlsng}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hldef}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{geometry} 
+
+\title{\Huge CMP5352: Data Visualisation Report}
+\author{\Large Abhishek Paudel (23140737)}
+\date {June-14, 2024}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\begin{abstract}
+This report examines Adidas' sales data in the United States, using charts to assess their performance. I discovered that Adidas succeeds in the West, where they sell the most and generate the most revenue. Sales have been increasing over time, though they decreased at the start of the pandemic. However, Adidas recovered quickly, demonstrating their resilience in difficult times. Their athletic shoes are extremely popular, and their partnership with Foot Locker appears to be a huge success. While most sales take place in physical stores, online sales have a higher profit margin, indicating that Adidas should improve their online sales strategy. Overall, Adidas is doing well, but they could do even better by focusing on the West, online sales, and athletic footwear.
+
+\end{abstract}
+
+\newpage
+
+\section{Introduction}
+
+Data visualization is an effective tool for analyzing large datasets and extracting useful insights. The purpose of this report is to use visual analytics to investigate Adidas' sales performance and profitability in the United States.
+
+
+\section{Motivation and Objectives}
+
+The primary motivation behind this analysis is to understand the sales dynamics of Adidas across different regions, products, and sales methods. By visualizing the data, we aim to answer the following questions:
+\begin{itemize}
+    \item Which region contributes the most to total sales and profitability?
+    \item How do sales trends vary over time?
+    \item What is the distribution of sales among different products and sales methods?
+    \item How does the profitability differ across sales methods and regions?
+\end{itemize}
+The dataset contains over 1000 observations with variables such as retailer, invoice date, region, product, price per unit, units sold, total sales, operating profit, operating margin, and sales method.
+
+\section{Data Description}
+
+The dataset contains the following variables:
+\begin{itemize}
+    \item \textbf{Retailer}: Foot Locker, Walmart, Sports Direct, West Gear.
+    \item \textbf{Retailer ID}: Unique ID for each retailer.
+    \item \textbf{Invoice Date}: Date of invoice issuance.
+    \item \textbf{Region}: West, Northeast, Southeast, South, Midwest.
+    \item \textbf{Product}: Men's Street Footwear, Men's Athletic Footwear, Women's Street Footwear, Women's Athletic Footwear, Men's Apparel, Women's Apparel.
+    \item \textbf{Price per unit}: Cost of a single product unit.
+    \item \textbf{Units sold}: Number of product units sold within a given period.
+    \item \textbf{Total sales}: Overall revenue from sales.
+    \item \textbf{Operating profit}: Profit from core operations.
+    \item \textbf{Operating margin}: Ratio of operating profit to revenue.
+    \item \textbf{Sales method}: In-store, Outlet, Online.
+\end{itemize}
+Data source: \href{https://www.kaggle.com/datasets/heemalichaudhari/adidas-sales-dataset/download?datasetVersionNumber=1}{click here}
+\newpage
+
+\section{Data Pre-processing and Visualization}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Load necessary libraries}
+\hlkwd{library}\hldef{(plotly)}
+\hlkwd{library}\hldef{(readxl)}
+\hlkwd{library}\hldef{(dplyr)}
+
+\hlcom{# Load the dataset}
+\hldef{Adidas_data} \hlkwb{<-} \hlkwd{read_excel}\hldef{(}\hlsng{"Adidas US Sales Datasets.xlsx"}\hldef{)}
+
+\hlcom{# Data Cleaning and Preparation}
+\hldef{Adidas_data}\hlopt{$}\hldef{Year} \hlkwb{<-} \hlkwd{format}\hldef{(}\hlkwd{as.Date}\hldef{(Adidas_data}\hlopt{$}\hldef{`Invoice Date`),} \hlsng{"%Y"}\hldef{)}
+\hldef{Adidas_data}\hlopt{$}\hldef{`Invoice Date`} \hlkwb{<-} \hlkwd{as.Date}\hldef{(Adidas_data}\hlopt{$}\hldef{`Invoice Date`)}
+\hldef{Adidas_data} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%} \hlkwd{filter}\hldef{(`Total Sales`} \hlopt{>=} \hlnum{0}\hldef{)}
+\hldef{Adidas_data}\hlopt{$}\hldef{Region} \hlkwb{<-} \hlkwd{as.factor}\hldef{(Adidas_data}\hlopt{$}\hldef{Region)}
+\hldef{Adidas_data}\hlopt{$}\hldef{`Sales Method`} \hlkwb{<-} \hlkwd{as.factor}\hldef{(Adidas_data}\hlopt{$}\hldef{`Sales Method`)}
+\hldef{Adidas_data}\hlopt{$}\hldef{Product} \hlkwb{<-} \hlkwd{as.factor}\hldef{(Adidas_data}\hlopt{$}\hldef{Product)}
+\hldef{Adidas_data}\hlopt{$}\hldef{Retailer} \hlkwb{<-} \hlkwd{as.factor}\hldef{(Adidas_data}\hlopt{$}\hldef{Retailer)}
+\hldef{Adidas_data}\hlopt{$}\hldef{`Total Sales`} \hlkwb{<-} \hlkwd{as.numeric}\hldef{(}\hlkwd{gsub}\hldef{(}\hlsng{"[^0-9.-]"}\hldef{,} \hlsng{""}\hldef{,}
+                                             \hldef{Adidas_data}\hlopt{$}\hldef{`Total Sales`))}
+\hldef{Adidas_data}\hlopt{$}\hldef{`Operating Profit`} \hlkwb{<-} \hlkwd{as.numeric}\hldef{(}\hlkwd{gsub}\hldef{(}\hlsng{"[^0-9.-]"}\hldef{,}
+                                            \hlsng{""}\hldef{, Adidas_data}\hlopt{$}\hldef{`Operating Profit`))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\newpage
+
+\section{Experimental Results}
+
+\subsection{Sales Analysis}
+
+\subsubsection{Total Sales by Region (Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 1. Total Sales by Region (Bar Chart)}
+\hldef{total_sales_region} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(Region)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Sales} \hldef{=} \hlkwd{sum}\hldef{(`Total Sales`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(total_sales_region,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Region,} \hlkwc{y} \hldef{= Total_Sales))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"skyblue"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Sales by Region"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Region"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Sales (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{30}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{)}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"total_sales_region.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{15}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{9}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{total_sales_region.png}
+\caption{Total Sales by Region}
+\label{fig:total_sales_region}
+\end{figure}
+
+\textbf{Interpretation} The bar chart clearly shows that the West region has the highest total sales, followed by the Northeast, Southeast, South, and lastly the Midwest. The difference in sales between the West and the other regions is substantial, highlighting the West's significant contribution to Adidas's overall revenue.
+
+\newpage
+
+\subsubsection{Sales Trend over Time (Line Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Sales Trend Over Time}
+\hldef{sales_trend} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(`Invoice Date`)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Sales} \hldef{=} \hlkwd{sum}\hldef{(`Total Sales`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(sales_trend,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= `Invoice Date`,} \hlkwc{y} \hldef{= Total_Sales))} \hlopt{+}
+  \hlkwd{geom_line}\hldef{(}\hlkwc{color} \hldef{=} \hlsng{"blue"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Sales Trend Over Time"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Date"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Sales (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{30}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{)}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"sales_trend_over_time.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{12}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{8}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{sales_trend_over_time.png}
+\caption{Sales Trend Over Time}
+\label{fig:sales_trend_over_time}
+\end{figure}
+
+\textbf{Interpretation} This line graph depicts the evolution of Adidas' total sales through time. The chart shows a general upward trend, indicating consistent sales growth. However, the line shows a noticeable dip around April 2020, coinciding with the start of the COVID-19 pandemic. The sharp drop in sales is likely due to the impact of lockdowns, supply chain disruptions, and changes in consumer behavior during that time. Adidas's subsequent recovery of the line demonstrates its resilience and ability to adapt to difficult circumstances.
+
+\newpage
+
+\subsubsection{Sales by Retailer (Stacked Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 4. Sales by Retailer (Stacked Bar Chart)}
+\hldef{sales_by_retailer} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(Retailer)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Sales} \hldef{=} \hlkwd{sum}\hldef{(`Total Sales`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(sales_by_retailer,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Retailer,} \hlkwc{y} \hldef{= Total_Sales,} \hlkwc{fill} \hldef{= Retailer))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Sales by Retailer"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Retailer"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Sales (Million)"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"Retailer"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+   \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{legend.position} \hldef{=} \hlsng{"none"}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"sales_by_retailer.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{14}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{8}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{sales_by_retailer.png}
+\caption{Total Sales by Retailer}
+\label{fig:sales_by_retailer}
+\end{figure}
+
+\textbf{Interpretation} This bar chart shows the total sales generated by each retailer. It reveals that West Gear is the top-performing retailer for Adidas, followed by Foot Locker and Walmart. This highlights the success of Adidas with these specific retailers.
+\newpage
+\newpage
+
+\subsubsection{Sales by Sales Method (Stacked Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 5. Sales by Sales Method (Stacked Bar Chart)}
+\hldef{sales_by_sales_method} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(`Sales Method`)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Sales} \hldef{=} \hlkwd{sum}\hldef{(`Total Sales`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(sales_by_sales_method,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= `Sales Method`,} \hlkwc{y} \hldef{= Total_Sales,} \hlkwc{fill} \hldef{= `Sales Method`))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Sales by Sales Method"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Sales Method"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Sales (Million)"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"Sales Method"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+   \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{legend.position} \hldef{=} \hlsng{"none"}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"sales_by_sales_method.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{13}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{10}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{sales_by_sales_method.png}
+\caption{Total Sales by Sales Method}
+\label{fig:sales_by_sales_method}
+\end{figure}
+
+\textbf{Interpretation} This bar chart shows total sales by sales method. The chart shows that the largest amount of Adidas' sales is through the in-store method. While the outlet method is also strong, the online method has significantly lower sales. This could indicate that Adidas has opportunities to improve its online presence and sales strategies.
+\newpage
+
+\subsubsection {Quarterly Sales Trend by Region (Facet plot)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Data manipulation}
+\hldef{quarterly_sales} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{mutate}\hldef{(}\hlkwc{Quarter} \hldef{=} \hlkwd{quarters}\hldef{(`Invoice Date`),} \hlkwc{Year} \hldef{=} \hlkwd{as.numeric}\hldef{(}\hlkwd{format}\hldef{(`Invoice Date`,} \hlsng{"%Y"}\hldef{)))} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(Region, Year, Quarter)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Sales} \hldef{=} \hlkwd{sum}\hldef{(`Total Sales`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlopt{%>%}
+  \hlkwd{arrange}\hldef{(Year, Quarter)}
+
+\hlcom{# Generate all combinations of Region, Year, and Quarter}
+\hldef{all_combinations} \hlkwb{<-} \hlkwd{expand.grid}\hldef{(}
+  \hlkwc{Region} \hldef{=} \hlkwd{unique}\hldef{(Adidas_data}\hlopt{$}\hldef{Region),}
+  \hlkwc{Year} \hldef{=} \hlkwd{unique}\hldef{(}\hlkwd{as.numeric}\hldef{(}\hlkwd{format}\hldef{(Adidas_data}\hlopt{$}\hldef{`Invoice Date`,} \hlsng{"%Y"}\hldef{))),}
+  \hlkwc{Quarter} \hldef{=} \hlkwd{unique}\hldef{(}\hlkwd{quarters}\hldef{(Adidas_data}\hlopt{$}\hldef{`Invoice Date`))}
+\hldef{)}
+
+\hlcom{# Merge with the actual sales data to ensure all combinations are included}
+\hldef{quarterly_sales} \hlkwb{<-} \hlkwd{merge}\hldef{(all_combinations, quarterly_sales,} \hlkwc{by} \hldef{=} \hlkwd{c}\hldef{(}\hlsng{"Region"}\hldef{,} \hlsng{"Year"}\hldef{,} \hlsng{"Quarter"}\hldef{),} \hlkwc{all.x} \hldef{=} \hlnum{TRUE}\hldef{)}
+\hldef{quarterly_sales[}\hlkwd{is.na}\hldef{(quarterly_sales)]} \hlkwb{<-} \hlnum{0}  \hlcom{# Replace NAs with 0}
+
+\hlcom{# Facet plot}
+\hlkwd{ggplot}\hldef{(quarterly_sales,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{=} \hlkwd{interaction}\hldef{(Year, Quarter),} \hlkwc{y} \hldef{= Total_Sales,} \hlkwc{fill} \hldef{= Region))} \hlopt{+}
+  \hlkwd{geom_col}\hldef{()} \hlopt{+}
+  \hlkwd{facet_wrap}\hldef{(}\hlopt{~}\hldef{Region,} \hlkwc{scales} \hldef{=} \hlsng{"free_y"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Quarterly Sales Trend by Region"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Quarter-Year"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Sales (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text.x} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{angle} \hldef{=} \hlnum{45}\hldef{,} \hlkwc{hjust} \hldef{=} \hlnum{1}\hldef{,} \hlkwc{size} \hldef{=} \hlnum{12}\hldef{),}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{legend.position} \hldef{=} \hlsng{"none"}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"quarterly_sales_trend_by_region_facet.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{16}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{9}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{quarterly_sales_trend_by_region_facet.png}
+\caption{Quarterly Sales Trend by Region}
+\label{fig:quarterly_sales_trend_by_region_facet}
+\end{figure}
+
+\text 
+
+
+\textbf{Interpretation} This facet plot shows the quarterly sales trend in each region. The West region generally has higher sales than the other regions, and it also reveals how the different regions have been affected by the pandemic. We can see that most regions experienced a dip in sales in the second quarter of 2020, followed by a recovery in subsequent quarters.
+
+
+\newpage
+
+\subsection{Profitability Analysis}
+
+\subsubsection{Operating Profit by Region (Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 1. Operating Profit by Region (Bar Chart)}
+\hldef{profit_by_region} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(Region)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Profit} \hldef{=} \hlkwd{sum}\hldef{(`Operating Profit`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(profit_by_region,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Region,} \hlkwc{y} \hldef{= Total_Profit))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"darkblue"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Operating Profit by Region"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Region"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Operating Profit (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{)}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"profit_by_region.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{16}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{9}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{profit_by_region.png}
+\caption{Total Operating Profit by Region}
+\label{fig:profit_by_region}
+\end{figure}
+
+\textbf{Interpretation} This bar chart shows the total operating profit generated by each region. We can see that the West region is the most profitable, followed by the Northeast, Southeast, South, and then the Midwest. This reinforces the insights that the West is the most successful region for Adidas based on sales performance.
+\newpage
+
+\subsubsection{Operating Profit by Sales Method (Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 2. Operating Profit by Sales Method (Bar Chart)}
+\hldef{profit_by_sales_method} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(`Sales Method`)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Profit} \hldef{=} \hlkwd{sum}\hldef{(`Operating Profit`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(profit_by_sales_method,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= `Sales Method`,} \hlkwc{y} \hldef{= Total_Profit))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"lightcoral"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Operating Profit by Sales Method"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Sales Method"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Operating Profit (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+   \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{)}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"profit_by_sales_method.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{14}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{7}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{profit_by_sales_method.png}
+\caption{Total Operating Profit by Sales Method}
+\label{fig:profit_by_sales_method}
+\end{figure}
+
+\textbf{Interpretation} This bar chart shows the total operating profit generated by each sales method. It reveals that the Outlet method has the highest profit, followed by in-store. While the online method is the lowest, this could also mean that Adidas has opportunities to improve its online sales strategy to increase profitability.
+\newpage
+
+\subsubsection{Operating Profit by Product (Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 3. Operating Profit by Product (Bar Chart)}
+\hldef{profit_by_product} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(Product)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Profit} \hldef{=} \hlkwd{sum}\hldef{(`Operating Profit`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(profit_by_product,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Product,} \hlkwc{y} \hldef{= Total_Profit))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"lightgreen"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Operating Profit by Product"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Product"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Operating Profit (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{axis.text.x} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{angle} \hldef{=} \hlnum{90}\hldef{,} \hlkwc{hjust} \hldef{=} \hlnum{1}\hldef{),}  \hlcom{# Rotate x-axis labels by 90 degrees}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{legend.position} \hldef{=} \hlsng{"none"}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"profit_by_product.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{18}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{19}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{profit_by_product.png}
+\caption{Total Operating Profit by Product}
+\label{fig:profit_by_product}
+\end{figure}
+
+\textbf{Interpretation} This bar chart shows the total operating profit generated by each product category. It reveals that Adidas' most profitable product categories are Men's Street Footwear and Women's Apparel. This reinforces the importance of athletic footwear to the Adidas brand and suggests that the company may also want to focus on its apparel offerings to increase profitability.
+
+\newpage
+\subsubsection{Operating Profit by Retailer (Bar Chart)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 4. Operating Profit by Retailer (Bar Chart)}
+\hldef{profit_by_retailer} \hlkwb{<-} \hldef{Adidas_data} \hlopt{%>%}
+  \hlkwd{group_by}\hldef{(Retailer)} \hlopt{%>%}
+  \hlkwd{summarise}\hldef{(}\hlkwc{Total_Profit} \hldef{=} \hlkwd{sum}\hldef{(`Operating Profit`)}\hlopt{/}\hlnum{1e6}\hldef{)} \hlcom{# Convert to Millions}
+
+\hlkwd{ggplot}\hldef{(profit_by_retailer,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Retailer,} \hlkwc{y} \hldef{= Total_Profit))} \hlopt{+}
+  \hlkwd{geom_bar}\hldef{(}\hlkwc{stat} \hldef{=} \hlsng{"identity"}\hldef{,} \hlkwc{fill} \hldef{=} \hlsng{"purple"}\hldef{)} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Total Operating Profit by Retailer"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Retailer"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Total Operating Profit (Million)"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{)}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+\hlkwd{ggsave}\hldef{(}\hlsng{"profit_by_retailer.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{14}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{10}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{profit_by_retailer.png}
+\caption{Total Operating Profit by Retailer}
+\label{fig:profit_by_retailer}
+\end{figure}
+
+\textbf{Interpretation} This box plot depicts the distribution of operating margins for all sales methods.  The online method has the highest median operating margin, followed by the outlet.  This suggests that Adidas should consider optimizing its online sales strategy to increase overall profitability.  The box plot also shows that operating margins vary greatly within each sales method, indicating that some retailers may be more profitable than others.
+
+\subsubsection{Operating Margin by Sales Method (Box Plot)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 5. Operating Margin by Region (Box Plot)}
+\hlkwd{ggplot}\hldef{(Adidas_data,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Region,} \hlkwc{y} \hldef{= `Operating Margin`,} \hlkwc{fill} \hldef{= Region))} \hlopt{+}
+  \hlkwd{geom_boxplot}\hldef{()} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Operating Margin by Region"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Region"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Operating Margin"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{40}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{25}\hldef{),}
+    \hlkwc{legend.position} \hldef{=} \hlsng{"none"}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"operating_margin_by_region.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{16}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{9}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{operating_margin_by_region.png}
+\caption{Operating Margin by Region}
+\label{fig:operating_margin_by_region}
+\end{figure}
+
+\textbf{Interpretation} This box plot shows the distribution of operating margin across all regions. The West region has the highest median operating margin, followed by the Northeast. This further reinforces the fact that the West region is profitable for Adidas. The box plot also shows that there is a lot of variation in operating margin within each region, indicating that Adidas needs to consider the specific factors that affect profitability in each region.
+
+
+\subsubsection{Operating margin by Product (Box plot)}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 7. Operating Margin by Product (Box Plot)}
+\hlkwd{ggplot}\hldef{(Adidas_data,} \hlkwd{aes}\hldef{(}\hlkwc{x} \hldef{= Product,} \hlkwc{y} \hldef{= `Operating Margin`,} \hlkwc{fill} \hldef{= Product))} \hlopt{+}
+  \hlkwd{geom_boxplot}\hldef{()} \hlopt{+}
+  \hlkwd{labs}\hldef{(}\hlkwc{title} \hldef{=} \hlsng{"Operating Margin by Product"}\hldef{,} \hlkwc{x} \hldef{=} \hlsng{"Product"}\hldef{,} \hlkwc{y} \hldef{=} \hlsng{"Operating Margin"}\hldef{)} \hlopt{+}
+  \hlkwd{theme}\hldef{(}
+    \hlkwc{axis.text.x} \hldef{=} \hlkwd{element_blank}\hldef{(),}
+    \hlkwc{axis.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{),}
+    \hlkwc{plot.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{),}
+    \hlkwc{axis.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{16}\hldef{),}
+    \hlkwc{legend.text} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{20}\hldef{),}
+    \hlkwc{legend.title} \hldef{=} \hlkwd{element_text}\hldef{(}\hlkwc{size} \hldef{=} \hlnum{30}\hldef{)}
+  \hldef{)} \hlkwb{->} \hldef{plot_object}
+
+\hlkwd{ggsave}\hldef{(}\hlsng{"operating_margin_by_product.png"}\hldef{,} \hlkwc{plot} \hldef{= plot_object,} \hlkwc{width} \hldef{=} \hlnum{12}\hldef{,} \hlkwc{height} \hldef{=} \hlnum{7}\hldef{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1.0\textwidth]{operating_margin_by_product.png}
+\caption{Total Operating Profit by Product}
+\label{fig:operating_margin_by_product}
+\end{figure}
+
+\textbf{Interpretation} This box plot shows the distribution of operating margin across all product categories. It shows that Men's Apparel and Women's Street Footwear have the highest median operating margins. This suggests that these product categories are profitable for Adidas, even though they do not generate as much total sales as athletic footwear. The box plot also shows that there is a lot of variation in operating margin within each product category, suggesting that there may be some products that are more profitable than others.
+
+\newpage
+
+\section{Summary and Findings}
+
+This report's visualizations and analysis reveal several key insights about Adidas' sales and profitability in the United States:
+
+\begin{itemize}
+    \item The West is Adidas' most profitable region. They consistently generate the highest sales and operating margins, demonstrating a strong market presence and a successful customer relationship.
+
+    \item The pandemic has had an impact on sales, which are generally increasing. While Adidas has shown resilience in recovering from the 2020 dip, the sharp drop in sales around April 2020 emphasizes the importance of monitoring external factors that may influence sales performance.
+
+    \item Online sales have the potential for increased profitability. Despite currently generating lower sales, the online method has the highest median operating margin, indicating opportunities to improve online presence and increase profitability.
+
+    \item Foot Locker is a key contributor to Adidas's success. hey have the highest total operating profit among retailers, demonstrating a successful partnership followed by Walmart..
+\end{itemize}
+
+These results indicate that Adidas should continue to promote its well-liked athletic footwear products and fortify its relationship with Foot Locker, while also giving priority to strategies that build on its strengths in the West and online sales.
+
+\section{Conclusion and Recommendations}
+
+The analysis of Adidas US sales data in this report serves as a solid foundation for understanding the brand's performance and identifying areas for improvement. While Adidas has achieved significant success, particularly in the Western region, a closer look reveals key areas where strategic adjustments can further optimise growth.
+
+\subsection{Key Insights}
+  \begin{itemize}
+\item Western Dominance: Adidas outperforms other regions in terms of sales and profitability. This demonstrates the brand's significant market presence and customer engagement in the region.
+
+\item Resilience and Growth: Adidas has shown consistent sales growth, even as it recovers from the pandemic's impact. However, the significant drop in sales during the early pandemic phase emphasizes the importance of proactive strategies for mitigating future disruptions.
+
+\item Athletic Footwear Strength: Athletic footwear clearly dominates all regions, highlighting Adidas' core strength and primary sales driver.
+\item Online Potential: While the online sales method currently accounts for a smaller proportion of total sales, it has a higher median operating margin, indicating significant potential for increased profitability through online strategy optimization.
+
+\item Retailer Partnerships: Foot Locker emerges as Adidas' top profit generator, demonstrating the success of their collaboration. Improving relationships with top-performing retailers could increase sales and revenue.
+
+\end{itemize}
+
+\subsection{Recommendations}
+  \begin{itemize}
+\item Invest in the West: Adidas should prioritize increasing its presence and marketing efforts in the western region. Capitalizing on its existing success could result in significant increases in sales and profitability.
+
+\item Unlock Online Growth: Adidas should prioritize optimizing its online sales strategy. This includes investing in online infrastructure, marketing campaigns, and possibly adjusting its online product offerings to better align with consumer preferences.
+
+\item Champion Athletic Footwear: Adidas should continue to promote its athletic footwear products, given their high performance. This could include targeted marketing campaigns, innovative product launches, and possibly expanding its athletic wear line.
+
+\item Strengthen Key Partnerships: Adidas should build on its successful partnership with Foot Locker and look into potential collaborations with other top-performing retailers. Building stronger relationships with key retailers could help it increase its market presence and revenue.
+
+\item Stay ahead of the curve: Adidas should continue to monitor sales trends, anticipate potential disruptions, and adjust its strategies accordingly. This proactive approach will help the brand maintain its competitive advantage and respond quickly to changing market dynamics.
+
+\end{itemize}
+
+By implementing these recommendations, Adidas will be able to build on its current strengths, address potential challenges, and solidify its position as a market leader in the United States.
+
+\newpage
+
+\section{References}
+
+\begin{thebibliography}{9}
+\bibitem{kaggle}
+Kaggle, \textit{Adidas US Sales Dataset}, \url{https://www.kaggle.com/datasets/heemalichaudhari/adidas-sales-dataset}
+\end{thebibliography}
+
+\end{document}
